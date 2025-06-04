@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avukat Kadir Karakuş Görsel Oluşturucu</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- html2canvas kütüphanesi CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Google Fonts CDN -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Lato:wght@100;300;400;700;900&family=Merriweather:wght@300;400;700;900&family=Montserrat:wght@100..900&family=Open+Sans:wght@300..800&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* Genel sayfa ve font ayarları */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Açık gri arka plan */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+        /* Ana konteyner: Sol taraf (kontroller) ve Sağ taraf (önizleme) */
+        .main-container {
+            display: flex;
+            flex-direction: column; /* Mobil için alt alta */
+            width: 100%;
+            max-width: 1400px; /* Geniş ekranlarda maksimum genişlik */
+            gap: 2rem; /* Sütunlar arası boşluk */
+        }
+        @media (min-width: 768px) { /* Tablet ve üzeri için yan yana */
+            .main-container {
+                flex-direction: row;
+            }
+        }
+
+        /* Sol taraf: Giriş formu konteyneri */
+        .main-input-container {
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+            padding: 2rem;
+            flex: 1; /* Esnek genişlik */
+            min-width: 320px; /* Minimum genişlik */
+        }
+        /* Sağ taraf: Canlı önizleme ve indirme butonu */
+        .live-preview-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1; /* Esnek genişlik */
+            min-width: 320px; /* Minimum genişlik */
+        }
+        @media (min-width: 768px) {
+             .live-preview-container {
+                max-width: 600px; /* Sağdaki kart için maksimum genişlik */
+                margin: 0 auto; /* Ortala */
+             }
+        }
+
+
+        /* Her bir girdi grubu için stil */
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .input-group label {
+            display: block;
+            font-weight: 600; /* semi-bold */
+            color: #374151; /* text-gray-700 */
+            margin-bottom: 0.5rem;
+        }
+        /* Dosya yükleme butonu ve dosya adı gösterimi */
+        .file-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem; /* Önizleme ile arasında boşluk */
+        }
+        .file-input-label {
+            background-color: #b48c4d; /* Altın rengi */
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem; /* rounded-lg */
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            font-weight: 500;
+            white-space: nowrap; /* Buton metni tek satırda kalsın */
+        }
+        .file-input-label:hover {
+            background-color: #a07f44; /* Hover rengi */
+        }
+        .file-input {
+            display: none; /* Gerçek dosya inputunu gizle */
+        }
+        .file-name {
+            color: #4b5563; /* text-gray-700 */
+            font-size: 0.9rem;
+            flex-grow: 1; /* Kalan alanı kapla */
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis; /* Uzun dosya adlarını kısalt */
+        }
+        /* Önizleme görselleri */
+        .preview-image {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            margin-top: 0.5rem;
+            display: none; /* Başlangıçta gizli */
+        }
+        /* Metin ve input kutuları */
+        input[type="text"],
+        textarea,
+        select,
+        input[type="color"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            border-radius: 0.5rem; /* rounded-lg */
+            font-size: 1rem;
+            color: #1f2937; /* text-gray-900 */
+            background-color: #ffffff; /* Select kutusu için arka plan */
+        }
+        input[type="color"] {
+            padding: 0.25rem; /* Renk seçici için daha az padding */
+            height: 40px; /* Renk seçici için sabit yükseklik */
+        }
+        textarea {
+            resize: vertical; /* Sadece dikeyde boyutlandırmaya izin ver */
+            min-height: 150px; /* Daha geniş metin alanı */
+        }
+        /* Oluştur butonu (Şimdi İndir butonu) */
+        .generate-button {
+            background-color: #3b82f6; /* Mavi renk */
+            color: #ffffff;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            width: 100%;
+            text-align: center;
+            margin-top: 1.5rem; /* Üstten boşluk */
+        }
+        .generate-button:hover {
+            background-color: #2563eb; /* Hover color */
+        }
+        .generate-button:disabled {
+            background-color: #a7f3d0; /* Hafif yeşil */
+            cursor: not-allowed;
+        }
+
+        /* Canlı önizleme kartının stili */
+        #livePreviewCard {
+            background-color: #ffffff; /* Default background color */
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+            padding: 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-blend-mode: normal;
+            width: 100%;
+            padding-bottom: 154.5%; /* Maintain aspect ratio */
+            position: relative;
+            margin-bottom: 1.5rem; /* İndirme butonu ile arasında boşluk */
+        }
+
+        .card-inner-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem 1.2rem; /* Dikey padding daha da azaltıldı */
+            box-sizing: border-box;
+        }
+
+        /* Card inner logo section */
+        .card-logo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 0.1rem; /* Çok azaltılmış padding */
+            border-bottom: 1px solid #e5e7eb; /* Light grey line */
+            margin-bottom: 0.8rem; /* Logo altındaki boşluk biraz daha azaltıldı */
+            width: 100%; /* Ensure it spans full width for border */
+        }
+        .card-logo-image {
+            width: 150px; /* Logo boyutu küçültüldü */
+            height: 150px; /* Logo boyutu küçültüldü */
+            object-fit: contain; /* Maintain aspect ratio */
+            margin-bottom: -1.5rem; /* Logoyu metne yaklaştırmak için negatif margin azaltıldı */
+        }
+        /* SVG logo için stil */
+        .card-logo-svg {
+            width: 150px; /* Logo boyutu küçültüldü */
+            height: 150px; /* Logo boyutu küçültüldü */
+            margin-bottom: -1.5rem; /* Logoyu metne yaklaştırmak için negatif margin azaltıldı */
+            fill: #b48c4d; /* SVG'nin varsayılan rengi */
+        }
+        .card-logo-text {
+            font-size: 2.8rem; /* Daha da küçük font boyutu */
+            font-weight: 900; /* Ultra bold */
+            color: #b48c4d; /* Altın rengi */
+            margin-bottom: 0.05rem; /* Çok küçük boşluk */
+            letter-spacing: 0.07em; /* Daha belirgin harf aralığı */
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2); /* Stronger shadow */
+            word-spacing: normal; /* Kelime arası boşluk normal */
+        }
+        .card-sub-logo-text {
+            font-size: 1.3rem; /* Daha da küçük font boyutu */
+            color: #374151; /* text-gray-700 */
+            font-weight: 600; /* Semi-bold */
+            letter-spacing: 0.03em;
+            margin-bottom: 0.4rem; /* Altındaki elementle boşluk */
+            word-spacing: normal; /* Kelime arası boşluk normal */
+        }
+        /* Yargıtay Kararı heading (fixed) */
+        .card-header {
+            font-size: 2.2rem; /* Daha da küçük font boyutu */
+            font-weight: 800; /* Extra bold */
+            color: #1f2937; /* text-gray-900 */
+            margin-top: -0.5rem; /* YARGITAY KARARI yazısı daha da yukarı kaldırıldı */
+            margin-bottom: 0.6rem; /* Azaltılmış boşluk */
+            letter-spacing: 0.04em;
+            word-spacing: normal; /* Kelime arası boşluk normal */
+            white-space: nowrap; /* Tek satırda kalmasını sağlar */
+            overflow: hidden; /* Taşan kısmı gizler */
+            text-overflow: ellipsis; /* Taşan kısım için üç nokta ekler */
+        }
+        /* Yargıtay Case Number (variable) */
+        .card-case-number {
+            font-size: 1.3rem; /* Daha da küçük font boyutu */
+            color: #4b5563; /* text-gray-700 */
+            margin-bottom: 0.8rem; /* Azaltılmış boşluk */
+            text-align: left; /* Align left */
+            font-weight: 500;
+            width: 100%; /* Ensure it takes full width for alignment */
+            padding-left: 1.2rem; /* Metinle aynı hizaya getirmek için */
+            padding-right: 1.2rem;
+            word-spacing: normal; /* Kelime arası boşluk normal */
+            white-space: normal; /* Metnin alt satıra geçmesini sağlar */
+        }
+        /* Main content of the decision (variable) */
+        .card-text-content {
+            font-size: 1.4rem; /* Daha da küçük font boyutu */
+            color: #1f2937; /* text-gray-900 */
+            line-height: 1.5; /* Optimize edilmiş satır aralığı */
+            margin-bottom: 1rem; /* Azaltılmış boşluk */
+            text-align: justify; /* Justify text */
+            padding: 0 1.2rem; /* Azaltılmış girinti */
+            white-space: pre-wrap; /* Preserve line breaks and allow wrapping */
+            flex-grow: 1; /* Allow content to grow */
+            overflow-y: auto; /* Enable scrolling if content is too long */
+            word-spacing: normal; /* Kelime arası boşluk normal */
+        }
+        /* Note text (fixed and right-aligned) */
+        .card-note-text {
+            font-size: 1.1rem; /* Daha da küçük font boyutu */
+            color: #6b7280; /* text-gray-500 */
+            margin-top: 1rem; /* Azaltılmış boşluk */
+            text-align: right; /* Align right */
+            font-style: italic;
+            width: 100%; /* Ensure it takes full width for alignment */
+            padding-right: 1.2rem; /* Metinle aynı hizaya getirmek için */
+            word-spacing: normal; /* Kelime arası boşluk normal */
+        }
+        /* Download button (in preview section) */
+        .download-preview-button {
+            background-color: #3b82f6; /* Mavi renk */
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem; /* rounded-lg */
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            width: fit-content; /* İçeriği kadar genişlik */
+            margin-left: auto; /* Ortalamak için */
+            margin-right: auto; /* Ortalamak için */
+        }
+        .download-preview-button:hover {
+            background-color: #2563eb; /* Hover color */
+        }
+
+
+        /* Footer text */
+        .footer-text {
+            margin-top: 3rem; /* Üstten boşluk */
+            font-size: 0.85rem; /* Küçük font boyutu */
+            color: #6b7280; /* Gri renk */
+            text-align: center; /* Ortala */
+            width: 100%;
+            max-width: 700px;
+            padding-bottom: 1.8rem; /* Alttan boşluk artırıldı */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767px) { /* Mobil cihazlar için */
+            .main-input-container, .live-preview-container {
+                padding: 1rem; /* Reduce padding for smaller screens */
+            }
+            .file-upload-section {
+                flex-direction: column; /* Stack vertically on mobile */
+                align-items: flex-start;
+            }
+            .file-input-group {
+                width: 100%;
+                margin-bottom: 0.75rem;
+            }
+            .card-logo-image, .card-logo-svg {
+                width: 100px; /* Adjust logo size for mobile */
+                height: 100px; /* Adjust logo size for mobile */
+                margin-bottom: -1rem; /* Mobil için ayar */
+            }
+            .card-logo-text {
+                font-size: 2.2rem; /* Mobil için daha küçük */
+            }
+            .card-sub-logo-text {
+                font-size: 1.1rem; /* Mobil için daha küçük */
+            }
+            .card-header {
+                font-size: 2rem; /* Mobil için daha da küçük */
+                margin-top: -0.3rem; /* Mobil için de yukarı kaldırıldı */
+            }
+            .card-case-number, .card-text-content {
+                font-size: 1.1rem; /* Mobil için daha küçük */
+            }
+            .card-note-text {
+                font-size: 0.9rem; /* Mobil için daha küçük */
+            }
+            .download-preview-button {
+                width: 100%; /* Full width on mobile */
+            }
+            #livePreviewCard {
+                padding-bottom: 154.5%; /* Adjust aspect ratio for mobile if needed */
+            }
+            .card-inner-content {
+                padding: 0.8rem 1rem; /* Mobil için iç padding artırıldı */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Sol Taraf: Kontrol Paneli -->
+        <div class="main-input-container">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Avukat Kadir Karakuş - Özel Görsel Oluşturucu</h1>
+
+            <div class="file-upload-section flex flex-wrap justify-between gap-4 mb-6">
+                <div class="input-group flex-1 min-w-[280px]">
+                    <label for="logoUpload">Logonuzu Yükleyin:</label>
+                    <div class="file-input-wrapper">
+                        <label for="logoUpload" class="file-input-label">Logo Seç</label>
+                        <input type="file" id="logoUpload" accept="image/*" class="file-input">
+                        <span id="logoFileName" class="file-name">Henüz dosya seçilmedi.</span>
+                    </div>
+                    <img id="logoPreview" class="preview-image mt-2" src="#" alt="Logo Önizleme">
+                </div>
+
+                <div class="input-group flex-1 min-w-[280px]">
+                    <label for="backgroundUpload">Arka Plan Görseli Yükleyin (İsteğe Bağlı):</label>
+                    <div class="file-input-wrapper">
+                        <label for="backgroundUpload" class="file-input-label">Arka Plan Seç</label>
+                        <input type="file" id="backgroundUpload" accept="image/*" class="file-input">
+                        <span id="backgroundFileName" class="file-name">Henüz dosya seçilmedi.</span>
+                    </div>
+                    <img id="backgroundPreview" class="preview-image mt-2" src="#" alt="Arka Plan Önizleme">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="backgroundSelect">Hazır Arka Plan Seçin:</label>
+                <select id="backgroundSelect">
+                    <option value="default">Varsayılan (Beyaz)</option>
+                    <option value="light-grey">Hafif Gri</option>
+                    <option value="dark-grey">Koyu Gri</option>
+                    <option value="gold-gradient">Altın Tonlu Gradient</option>
+                    <option value="blue-gradient">Mavi Tonlu Gradient</option>
+                    <option value="green-gradient">Yeşil Tonlu Gradient</option>
+                    <option value="purple-gradient">Mor Tonlu Gradient</option>
+                    <option value="subtle-paper">Hafif Kağıt Dokusu</option>
+                    <option value="dark-subtle">Koyu Tonlu (Hafif)</option>
+                    <option value="world-map-bg">Dünya Haritası (Referans)</option>
+                    <option value="abstract-lines">Soyut Çizgiler</option>
+                    <option value="geometric-pattern">Geometrik Desen</option>
+                    <option value="blur-effect">Hafif Bulanıklık</option>
+                    <option value="minimal-dots">Minimal Noktalar</option>
+                    <option value="soft-waves">Yumuşak Dalgalar</option>
+                </select>
+            </div>
+
+            <!-- Yazı Tipi ve Renk Kontrol Alanları -->
+            <div class="input-group">
+                <label class="block font-bold text-gray-800 mb-2">Metin Stilleri:</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- KARAKUŞ -->
+                    <div>
+                        <label for="karakusTextColor">KARAKUŞ Metin Rengi:</label>
+                        <input type="color" id="karakusTextColor" value="#b48c4d">
+                    </div>
+                    <div>
+                        <label for="karakusTextSize">KARAKUŞ Metin Boyutu:</label>
+                        <select id="karakusTextSize">
+                            <option value="2.5rem">Çok Küçük</option>
+                            <option value="2.8rem" selected>Küçük</option>
+                            <option value="3.2rem">Orta</option>
+                            <option value="3.8rem">Büyük</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="karakusFontFamily">KARAKUŞ Yazı Tipi:</label>
+                        <select id="karakusFontFamily">
+                            <option value="Inter, sans-serif" selected>Inter</option>
+                            <option value="Roboto, sans-serif">Roboto</option>
+                            <option value="Open Sans, sans-serif">Open Sans</option>
+                            <option value="Lato, sans-serif">Lato</option>
+                            <option value="Montserrat, sans-serif">Montserrat</option>
+                            <option value="Merriweather, serif">Merriweather</option>
+                        </select>
+                    </div>
+
+                    <!-- HUKUK ve DANIŞMANLIK -->
+                    <div>
+                        <label for="subLogoTextColor">HUKUK ve DANIŞMANLIK Metin Rengi:</label>
+                        <input type="color" id="subLogoTextColor" value="#374151">
+                    </div>
+                    <div>
+                        <label for="subLogoTextSize">HUKUK ve DANIŞMANLIK Metin Boyutu:</label>
+                        <select id="subLogoTextSize">
+                            <option value="1.1rem">Çok Küçük</option>
+                            <option value="1.3rem" selected>Küçük</option>
+                            <option value="1.5rem">Orta</option>
+                            <option value="1.7rem">Büyük</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="subLogoFontFamily">HUKUK ve DANIŞMANLIK Yazı Tipi:</label>
+                        <select id="subLogoFontFamily">
+                            <option value="Inter, sans-serif" selected>Inter</option>
+                            <option value="Roboto, sans-serif">Roboto</option>
+                            <option value="Open Sans, sans-serif">Open Sans</option>
+                            <option value="Lato, sans-serif">Lato</option>
+                            <option value="Montserrat, sans-serif">Montserrat</option>
+                            <option value="Merriweather, serif">Merriweather</option>
+                        </select>
+                    </div>
+
+                    <!-- YARGITAY KARARI -->
+                    <div>
+                        <label for="headerTextColor">YARGITAY KARARI Metin Rengi:</label>
+                        <input type="color" id="headerTextColor" value="#1f2937">
+                    </div>
+                    <div>
+                        <label for="headerTextSize">YARGITAY KARARI Metin Boyutu:</label>
+                        <select id="headerTextSize">
+                            <option value="1.8rem">Çok Çok Küçük</option>
+                            <option value="2.0rem">Çok Küçük</option>
+                            <option value="2.2rem" selected>Küçük</option>
+                            <option value="2.5rem">Orta</option>
+                            <option value="2.8rem">Büyük</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="headerFontFamily">YARGITAY KARARI Yazı Tipi:</label>
+                        <select id="headerFontFamily">
+                            <option value="Inter, sans-serif" selected>Inter</option>
+                            <option value="Roboto, sans-serif">Roboto</option>
+                            <option value="Open Sans, sans-serif">Open Sans</option>
+                            <option value="Lato, sans-serif">Lato</option>
+                            <option value="Montserrat, sans-serif">Montserrat</option>
+                            <option value="Merriweather, serif">Merriweather</option>
+                        </select>
+                    </div>
+
+                    <!-- Karar Numarası -->
+                    <div>
+                        <label for="caseNumberTextColor">Karar Numarası Metin Rengi:</label>
+                        <input type="color" id="caseNumberTextColor" value="#4b5563">
+                    </div>
+                    <div>
+                        <label for="caseNumberTextSize">Karar Numarası Metin Boyutu:</label>
+                        <select id="caseNumberTextSize">
+                            <option value="1.1rem">Çok Küçük</option>
+                            <option value="1.3rem" selected>Küçük</option>
+                            <option value="1.5rem">Orta</option>
+                            <option value="1.7rem">Büyük</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="caseNumberFontFamily">Karar Numarası Yazı Tipi:</label>
+                        <select id="caseNumberFontFamily">
+                            <option value="Inter, sans-serif" selected>Inter</option>
+                            <option value="Roboto, sans-serif">Roboto</option>
+                            <option value="Open Sans, sans-serif">Open Sans</option>
+                            <option value="Lato, sans-serif">Lato</option>
+                            <option value="Montserrat, sans-serif">Montserrat</option>
+                            <option value="Merriweather, serif">Merriweather</option>
+                        </select>
+                    </div>
+
+                    <!-- Ana Metin -->
+                    <div>
+                        <label for="mainContentTextColor">Ana Metin Rengi:</label>
+                        <input type="color" id="mainContentTextColor" value="#1f2937">
+                    </div>
+                    <div>
+                        <label for="mainContentTextSize">Ana Metin Boyutu:</label>
+                        <select id="mainContentTextSize">
+                            <option value="1.2rem">Çok Küçük</option>
+                            <option value="1.4rem" selected>Küçük</option>
+                            <option value="1.6rem">Orta</option>
+                            <option value="1.8rem">Büyük</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="mainContentFontFamily">Ana Metin Yazı Tipi:</label>
+                        <select id="mainContentFontFamily">
+                            <option value="Inter, sans-serif" selected>Inter</option>
+                            <option value="Roboto, sans-serif">Roboto</option>
+                            <option value="Open Sans, sans-serif">Open Sans</option>
+                            <option value="Lato, sans-serif">Lato</option>
+                            <option value="Montserrat, sans-serif">Montserrat</option>
+                            <option value="Merriweather, serif">Merriweather</option>
+                        </select>
+                    </div>
+
+                    <!-- Not Metni -->
+                    <div>
+                        <label for="noteTextColor">Not Metin Rengi:</label>
+                        <input type="color" id="noteTextColor" value="#6b7280">
+                    </div>
+                    <div>
+                        <label for="noteTextSize">Not Metin Boyutu:</label>
+                        <select id="noteTextSize">
+                            <option value="0.9rem">Çok Küçük</option>
+                            <option value="1.1rem" selected>Küçük</option>
+                            <option value="1.3rem">Orta</option>
+                            <option value="1.5rem">Büyük</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="noteFontFamily">Not Metin Yazı Tipi:</label>
+                        <select id="noteFontFamily">
+                            <option value="Inter, sans-serif" selected>Inter</option>
+                            <option value="Roboto, sans-serif">Roboto</option>
+                            <option value="Open Sans, sans-serif">Open Sans</option>
+                            <option value="Lato, sans-serif">Lato</option>
+                            <option value="Montserrat, sans-serif">Montserrat</option>
+                            <option value="Merriweather, serif">Merriweather</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <!-- Yazı Tipi ve Renk Kontrol Alanları Sonu -->
+
+            <div class="input-group">
+                <label for="caseNumber">Yargıtay Karar Numarası (Örn: 2023/12345 E. 2024/6789 K.):</label>
+                <input type="text" id="caseNumber" placeholder="Yargıtay karar numarasını girin...">
+            </div>
+
+            <div class="input-group">
+                <label for="mainContent">Kararın Ana Maddesi/İçeriği:</label>
+                <textarea id="mainContent" placeholder="Kararın ana maddesini buraya yazın..."></textarea>
+            </div>
+        </div>
+
+        <!-- Sağ Taraf: Canlı Önizleme ve İndirme Butonu -->
+        <div class="live-preview-container">
+            <div id="livePreviewCard">
+                <div class="card-inner-content">
+                    <!-- Logo Section -->
+                    <div class="card-logo-section">
+                        <!-- Logo için SVG -->
+                        <svg id="previewLogoSvg" class="card-logo-svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L2 22H22L12 2ZM12 5.6L19.4 20H4.6L12 5.6ZM12 10.5L14.5 15.5H9.5L12 10.5ZM12 12.5L10.5 15.5H13.5L12 12.5Z" />
+                        </svg>
+                        <!-- Yüklenen logo için img etiketi (varsayılan SVG'nin üzerine binecek) -->
+                        <img id="previewUploadedLogoImage" class="card-logo-image" src="" alt="Yüklenen Logo" style="display: none;">
+                        
+                        <div id="previewLogoText" class="card-logo-text">KARAKUŞ</div>
+                        <div id="previewSubLogoText" class="card-sub-logo-text">HUKUK ve DANIŞMANLIK</div>
+                    </div>
+                    <!-- Decision Content -->
+                    <h2 id="previewHeader" class="card-header">YARGITAY KARARI</h2>
+                    <p id="previewCaseNumber" class="card-case-number">Yargıtay XXX/XXX/XXXX E. XXXX/XXXX K.</p>
+                    <p id="previewMainContent" class="card-text-content">Buraya kararın ana maddesi gelecek.</p>
+                    <p id="previewNoteText" class="card-note-text">Not: Bu içerik bilgilendirme amaçlıdır.</p>
+                </div>
+            </div>
+            <button id="downloadPreviewBtn" class="download-preview-button">Görseli İndir (JPG)</button>
+            <div id="loadingMessage" class="text-center text-gray-600 mt-2 hidden">Oluşturuluyor... Lütfen bekleyin.</div>
+        </div>
+    </div>
+
+    <!-- Footer Metni -->
+    <div class="footer-text">
+        Caglar Yazılım tarafından Avukat Kadir Karakuş için özel olarak oluşturulan İndex'dir.
+    </div>
+
+    <script>
+        // DOM Elementleri
+        const logoUpload = document.getElementById('logoUpload');
+        const logoFileNameSpan = document.getElementById('logoFileName');
+        const logoPreview = document.getElementById('logoPreview');
+        const previewUploadedLogoImage = document.getElementById('previewUploadedLogoImage'); // Canlı önizleme için yüklenen logo img'si
+        const previewLogoSvg = document.getElementById('previewLogoSvg'); // Canlı önizleme için SVG logo
+
+        const backgroundUpload = document.getElementById('backgroundUpload');
+        const backgroundFileNameSpan = document.getElementById('backgroundFileName');
+        const backgroundPreview = document.getElementById('backgroundPreview');
+
+        const backgroundSelect = document.getElementById('backgroundSelect');
+        const caseNumberInput = document.getElementById('caseNumber');
+        const mainContentTextarea = document.getElementById('mainContent');
+
+        const downloadPreviewBtn = document.getElementById('downloadPreviewBtn'); // İndirme butonu
+        const loadingMessage = document.getElementById('loadingMessage');
+        const livePreviewCard = document.getElementById('livePreviewCard'); // Canlı önizleme kartı
+
+        // Canlı önizleme metin elementleri
+        const previewLogoText = document.getElementById('previewLogoText');
+        const previewSubLogoText = document.getElementById('previewSubLogoText');
+        const previewHeader = document.getElementById('previewHeader');
+        const previewCaseNumber = document.getElementById('previewCaseNumber');
+        const previewMainContent = document.getElementById('previewMainContent');
+        const previewNoteText = document.getElementById('previewNoteText');
+
+        // Metin stili kontrol inputları
+        const karakusTextColor = document.getElementById('karakusTextColor');
+        const karakusTextSize = document.getElementById('karakusTextSize');
+        const karakusFontFamily = document.getElementById('karakusFontFamily'); // Yeni
+        const subLogoTextColor = document.getElementById('subLogoTextColor');
+        const subLogoTextSize = document.getElementById('subLogoTextSize');
+        const subLogoFontFamily = document.getElementById('subLogoFontFamily'); // Yeni
+        const headerTextColor = document.getElementById('headerTextColor');
+        const headerTextSize = document.getElementById('headerTextSize');
+        const headerFontFamily = document.getElementById('headerFontFamily'); // Yeni
+        const caseNumberTextColor = document.getElementById('caseNumberTextColor');
+        const caseNumberTextSize = document.getElementById('caseNumberTextSize');
+        const caseNumberFontFamily = document.getElementById('caseNumberFontFamily'); // Yeni
+        const mainContentTextColor = document.getElementById('mainContentTextColor');
+        const mainContentTextSize = document.getElementById('mainContentTextSize');
+        const mainContentFontFamily = document.getElementById('mainContentFontFamily'); // Yeni
+        const noteTextColor = document.getElementById('noteTextColor');
+        const noteTextSize = document.getElementById('noteTextSize');
+        const noteFontFamily = document.getElementById('noteFontFamily'); // Yeni
+
+
+        // Local Storage'dan yüklenen veriler
+        let uploadedLogoDataURL = localStorage.getItem('uploadedLogoDataURL') || '';
+        let uploadedBackgroundDataURL = localStorage.getItem('uploadedBackgroundDataURL') || '';
+        let selectedPredefinedBackground = localStorage.getItem('selectedPredefinedBackground') || 'default'; // Varsayılanı 'default' (beyaz) olarak değiştirdim
+
+        // Metin rengi, boyutu ve yazı tipi ayarları için varsayılan değerler
+        const defaultTextStyles = {
+            karakus: { color: '#b48c4d', size: '2.8rem', fontFamily: 'Inter, sans-serif' },
+            subLogo: { color: '#374151', size: '1.3rem', fontFamily: 'Inter, sans-serif' },
+            header: { color: '#1f2937', size: '2.2rem', fontFamily: 'Inter, sans-serif' },
+            caseNumber: { color: '#4b5563', size: '1.3rem', fontFamily: 'Inter, sans-serif' },
+            mainContent: { color: '#1f2937', size: '1.4rem', fontFamily: 'Inter, sans-serif' },
+            note: { color: '#6b7280', size: '1.1rem', fontFamily: 'Inter, sans-serif' }
+        };
+
+        // Local Storage'dan stil ayarlarını yükle veya varsayılanları kullan
+        function loadTextStylesFromLocalStorage() {
+            for (const key in defaultTextStyles) {
+                const storedColor = localStorage.getItem(`${key}TextColor`);
+                const storedSize = localStorage.getItem(`${key}TextSize`);
+                const storedFontFamily = localStorage.getItem(`${key}FontFamily`); // Yeni
+
+                if (storedColor) document.getElementById(`${key}TextColor`).value = storedColor;
+                if (storedSize) document.getElementById(`${key}TextSize`).value = storedSize;
+                else document.getElementById(`${key}TextSize`).value = defaultTextStyles[key].size;
+
+                if (storedFontFamily) document.getElementById(`${key}FontFamily`).value = storedFontFamily; // Yeni
+                else document.getElementById(`${key}FontFamily`).value = defaultTextStyles[key].fontFamily; // Yeni
+            }
+        }
+
+        // Local Storage'a stil ayarlarını kaydet
+        function saveTextStylesToLocalStorage() {
+            for (const key in defaultTextStyles) {
+                localStorage.setItem(`${key}TextColor`, document.getElementById(`${key}TextColor`).value);
+                localStorage.setItem(`${key}TextSize`, document.getElementById(`${key}TextSize`).value);
+                localStorage.setItem(`${key}FontFamily`, document.getElementById(`${key}FontFamily`).value); // Yeni
+            }
+        }
+
+
+        // Hazır arka plan temaları (artık metin yazmayan URL'ler veya CSS gradient'leri)
+        const predefinedBackgrounds = {
+            'default': { backgroundColor: '#ffffff', backgroundImage: 'none' },
+            'light-grey': { backgroundColor: '#f8f8f8', backgroundImage: 'none' },
+            'dark-grey': { backgroundColor: '#e0e0e0', backgroundImage: 'none' },
+            'gold-gradient': { backgroundColor: '', backgroundImage: 'linear-gradient(to bottom right, #fffbe0, #fff0c0)' },
+            'blue-gradient': { backgroundColor: '', backgroundImage: 'linear-gradient(to bottom right, #e0e7ff, #c3d4ff)' },
+            'green-gradient': { backgroundColor: '', backgroundImage: 'linear-gradient(to bottom right, #e6ffe6, #c0ffc0)' },
+            'purple-gradient': { backgroundColor: '', backgroundImage: 'linear-gradient(to bottom right, #f0e6ff, #d4c0ff)' },
+            'subtle-paper': {
+                backgroundColor: '#fdfdfd',
+                backgroundImage: 'url("https://i.imgur.com/gK97r5a.png")', // Örnek dokulu görsel (metinsiz)
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center'
+            },
+            'dark-subtle': {
+                backgroundColor: '#2d3748',
+                backgroundImage: 'linear-gradient(to bottom right, #2d3748, #1a202c)',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center'
+            },
+            'world-map-bg': { // Bu tema artık beyaz arka planlı
+                backgroundColor: '#ffffff', // Tamamen beyaz arka plan
+                backgroundImage: 'none', // Görsel yok
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center'
+            },
+            'abstract-lines': {
+                backgroundColor: '#f0f2f5',
+                backgroundImage: 'linear-gradient(to right, #f0f2f5 0%, #e0e2e5 50%, #f0f2f5 100%)', // CSS gradient ile soyut çizgiler
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center'
+            },
+            'geometric-pattern': {
+                backgroundColor: '#f0f2f5',
+                backgroundImage: 'repeating-linear-gradient(45deg, #d0d2d5 0, #d0d2d5 1px, transparent 0, transparent 50%)', // CSS ile geometrik desen
+                backgroundSize: '10px 10px',
+                backgroundRepeat: 'repeat',
+                backgroundPosition: 'center'
+            },
+            'blur-effect': {
+                backgroundColor: '#f0f2f5',
+                backgroundImage: 'linear-gradient(to bottom right, #c0c2c5, #e0e2e5)', // Basit bulanıklık efekti için gradient
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center'
+            },
+            'minimal-dots': {
+                backgroundColor: '#ffffff',
+                backgroundImage: 'radial-gradient(circle, #e0e0e0 1px, transparent 1px)', // CSS ile minimal noktalar
+                backgroundSize: '10px 10px',
+                backgroundRepeat: 'repeat',
+                backgroundPosition: 'center'
+            },
+            'soft-waves': {
+                backgroundColor: '#f0f2f5',
+                backgroundImage: 'linear-gradient(135deg, #f0f2f5 25%, #d0e0f0 50%, #f0f2f5 75%)', // CSS ile yumuşak dalgalar
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center'
+            }
+        };
+
+        // Önizlemeyi güncelleyen ana fonksiyon
+        function updateLivePreview() {
+            // Arka planı uygula
+            const currentSelectedBackground = backgroundSelect.value;
+            if (currentSelectedBackground === 'uploaded' && uploadedBackgroundDataURL) {
+                livePreviewCard.style.backgroundImage = `url('${uploadedBackgroundDataURL}')`;
+                livePreviewCard.style.backgroundColor = '';
+                livePreviewCard.style.backgroundBlendMode = 'normal';
+            } else if (predefinedBackgrounds[currentSelectedBackground]) {
+                const bg = predefinedBackgrounds[currentSelectedBackground];
+                livePreviewCard.style.backgroundColor = bg.backgroundColor || '';
+                livePreviewCard.style.backgroundImage = bg.backgroundImage || 'none';
+                livePreviewCard.style.backgroundSize = bg.backgroundSize || 'cover';
+                livePreviewCard.style.backgroundRepeat = bg.backgroundRepeat || 'no-repeat';
+                livePreviewCard.style.backgroundPosition = bg.backgroundPosition || 'center';
+                livePreviewCard.style.backgroundBlendMode = 'normal';
+            } else {
+                livePreviewCard.style.backgroundImage = 'none';
+                livePreviewCard.style.backgroundColor = '#ffffff'; // Varsayılan beyaz
+                livePreviewCard.style.backgroundBlendMode = 'normal';
+            }
+
+            // Logo güncelle: Yüklenen logo varsa onu göster, yoksa SVG'yi göster
+            if (uploadedLogoDataURL) {
+                previewUploadedLogoImage.src = uploadedLogoDataURL;
+                previewUploadedLogoImage.style.display = 'block';
+                previewLogoSvg.style.display = 'none';
+            } else {
+                previewUploadedLogoImage.style.display = 'none';
+                previewLogoSvg.style.display = 'block';
+                // SVG'nin rengini de KARAKUŞ metin rengiyle aynı yap
+                previewLogoSvg.style.fill = karakusTextColor.value;
+            }
+
+            // Metin içeriklerini güncelle
+            previewCaseNumber.textContent = caseNumberInput.value.trim() || 'Yargıtay XXX/XXX/XXXX E. XXXX/XXXX K.';
+            previewMainContent.textContent = mainContentTextarea.value.trim() || 'Buraya kararın ana maddesi gelecek.';
+
+            // Metin renklerini, boyutlarını ve yazı tiplerini güncelle
+            previewLogoText.style.color = karakusTextColor.value;
+            previewLogoText.style.fontSize = karakusTextSize.value;
+            previewLogoText.style.fontFamily = karakusFontFamily.value; // Yeni
+
+            previewSubLogoText.style.color = subLogoTextColor.value;
+            previewSubLogoText.style.fontSize = subLogoTextSize.value;
+            previewSubLogoText.style.fontFamily = subLogoFontFamily.value; // Yeni
+
+            previewHeader.style.color = headerTextColor.value;
+            previewHeader.style.fontSize = headerTextSize.value;
+            previewHeader.style.fontFamily = headerFontFamily.value; // Yeni
+
+            previewCaseNumber.style.color = caseNumberTextColor.value;
+            previewCaseNumber.style.fontSize = caseNumberTextSize.value;
+            previewCaseNumber.style.fontFamily = caseNumberFontFamily.value; // Yeni
+
+            previewMainContent.style.color = mainContentTextColor.value;
+            previewMainContent.style.fontSize = mainContentTextSize.value;
+            previewMainContent.style.fontFamily = mainContentFontFamily.value; // Yeni
+
+            previewNoteText.style.color = noteTextColor.value;
+            previewNoteText.style.fontSize = noteTextSize.value;
+            previewNoteText.style.fontFamily = noteFontFamily.value; // Yeni
+
+            // Stil ayarlarını kaydet (her değişiklikte)
+            saveTextStylesToLocalStorage();
+        }
+
+        // Local Storage'dan önizleme ve dosya adı bilgilerini yükle
+        function updatePreviewsFromStorage() {
+            if (uploadedLogoDataURL) {
+                logoPreview.src = uploadedLogoDataURL;
+                logoPreview.style.display = 'block';
+                logoFileNameSpan.textContent = 'Yüklenen logo hazır.';
+            }
+            if (uploadedBackgroundDataURL) {
+                backgroundPreview.src = uploadedBackgroundDataURL;
+                backgroundPreview.style.display = 'block';
+                backgroundFileNameSpan.textContent = 'Yüklenen arka plan hazır.';
+                const uploadedOptionExists = Array.from(backgroundSelect.options).some(option => option.value === 'uploaded');
+                if (!uploadedOptionExists) {
+                    const uploadedOption = document.createElement('option');
+                    uploadedOption.value = 'uploaded';
+                    uploadedOption.textContent = 'Yüklenen Görsel';
+                    backgroundSelect.appendChild(uploadedOption);
+                }
+            }
+            backgroundSelect.value = selectedPredefinedBackground;
+            loadTextStylesFromLocalStorage(); // Metin stillerini de yükle
+            updateLivePreview(); // İlk yüklemede önizlemeyi oluştur
+        }
+
+        // Sayfa yüklendiğinde önizlemeyi ve verileri hazırla
+        document.addEventListener('DOMContentLoaded', updatePreviewsFromStorage);
+
+        // Event Listener'lar: Herhangi bir input değiştiğinde önizlemeyi güncelle
+        logoUpload.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                logoFileNameSpan.textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedLogoDataURL = e.target.result;
+                    localStorage.setItem('uploadedLogoDataURL', uploadedLogoDataURL);
+                    logoPreview.src = uploadedLogoDataURL;
+                    logoPreview.style.display = 'block';
+                    updateLivePreview();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                logoFileNameSpan.textContent = 'Henüz dosya seçilmedi.';
+                uploadedLogoDataURL = '';
+                localStorage.removeItem('uploadedLogoDataURL');
+                logoPreview.style.display = 'none';
+                logoPreview.src = '#';
+                updateLivePreview();
+            }
+        });
+
+        backgroundUpload.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                backgroundFileNameSpan.textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedBackgroundDataURL = e.target.result;
+                    localStorage.setItem('uploadedBackgroundDataURL', uploadedBackgroundDataURL);
+                    backgroundPreview.src = uploadedBackgroundDataURL;
+                    backgroundPreview.style.display = 'block';
+                    const uploadedOptionExists = Array.from(backgroundSelect.options).some(option => option.value === 'uploaded');
+                    if (!uploadedOptionExists) {
+                        const uploadedOption = document.createElement('option');
+                        uploadedOption.value = 'uploaded';
+                        uploadedOption.textContent = 'Yüklenen Görsel';
+                        backgroundSelect.appendChild(uploadedOption);
+                    }
+                    backgroundSelect.value = 'uploaded';
+                    localStorage.setItem('selectedPredefinedBackground', 'uploaded');
+                    updateLivePreview();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                backgroundFileNameSpan.textContent = 'Henüz dosya seçilmedi.';
+                uploadedBackgroundDataURL = '';
+                localStorage.removeItem('uploadedBackgroundDataURL');
+                backgroundPreview.style.display = 'none';
+                backgroundPreview.src = '#';
+                if (backgroundSelect.value === 'uploaded') {
+                    backgroundSelect.value = 'default'; // Yüklenen kaldırılırsa varsayılan beyaz seç
+                    localStorage.setItem('selectedPredefinedBackground', 'default');
+                }
+                updateLivePreview();
+            }
+        });
+
+        backgroundSelect.addEventListener('change', function() {
+            selectedPredefinedBackground = backgroundSelect.value;
+            localStorage.setItem('selectedPredefinedBackground', selectedPredefinedBackground);
+            if (selectedPredefinedBackground !== 'uploaded') {
+                backgroundUpload.value = '';
+                backgroundFileNameSpan.textContent = 'Henüz dosya seçilmedi.';
+                uploadedBackgroundDataURL = '';
+                localStorage.removeItem('uploadedBackgroundDataURL');
+                backgroundPreview.style.display = 'none';
+                backgroundPreview.src = '#';
+            }
+            updateLivePreview();
+        });
+
+        caseNumberInput.addEventListener('input', updateLivePreview);
+        mainContentTextarea.addEventListener('input', updateLivePreview);
+
+        // Renk, boyut ve yazı tipi seçiciler için event listener'lar
+        karakusTextColor.addEventListener('input', updateLivePreview);
+        karakusTextSize.addEventListener('change', updateLivePreview);
+        karakusFontFamily.addEventListener('change', updateLivePreview); // Yeni
+        subLogoTextColor.addEventListener('input', updateLivePreview);
+        subLogoTextSize.addEventListener('change', updateLivePreview);
+        subLogoFontFamily.addEventListener('change', updateLivePreview); // Yeni
+        headerTextColor.addEventListener('input', updateLivePreview);
+        headerTextSize.addEventListener('change', updateLivePreview);
+        headerFontFamily.addEventListener('change', updateLivePreview); // Yeni
+        caseNumberTextColor.addEventListener('input', updateLivePreview);
+        caseNumberTextSize.addEventListener('change', updateLivePreview);
+        caseNumberFontFamily.addEventListener('change', updateLivePreview); // Yeni
+        mainContentTextColor.addEventListener('input', updateLivePreview);
+        mainContentTextSize.addEventListener('change', updateLivePreview);
+        mainContentFontFamily.addEventListener('change', updateLivePreview); // Yeni
+        noteTextColor.addEventListener('input', updateLivePreview);
+        noteTextSize.addEventListener('change', updateLivePreview);
+        noteFontFamily.addEventListener('change', updateLivePreview); // Yeni
+
+
+        // İndirme butonu işlevi
+        downloadPreviewBtn.addEventListener('click', function() {
+            loadingMessage.classList.remove('hidden');
+            downloadPreviewBtn.disabled = true;
+
+            html2canvas(livePreviewCard, {
+                scale: 3, // Yüksek çözünürlük için 3'e yükseltildi
+                useCORS: true,
+                backgroundColor: null, // Arka plan rengini şeffaf bırak, kartın kendi arka planını kullansın
+            }).then(function(canvas) {
+                const imageUrl = canvas.toDataURL('image/jpeg', 0.9); // JPG olarak indir
+                const link = document.createElement('a');
+                link.href = imageUrl;
+                link.download = 'yargitay-karari.jpg';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                loadingMessage.classList.add('hidden');
+                downloadPreviewBtn.disabled = false;
+            });
+        });
+
+        // Custom alert function
+        function showAlert(message) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+                z-index: 1000;
+                text-align: center;
+                max-width: 300px;
+                width: 90%;
+            `;
+            modal.innerHTML = `
+                <p>${message}</p>
+                <button style="margin-top: 15px; padding: 8px 15px; background-color: #b48c4d; color: white; border: none; border-radius: 5px; cursor: pointer;">Tamam</button>
+            `;
+            document.body.appendChild(modal);
+
+            modal.querySelector('button').onclick = () => {
+                document.body.removeChild(modal);
+            };
+        }
+    </script>
+</body>
+</html>
+
