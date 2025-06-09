@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booting...</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="boot-screen">
+    <pre>
+        BIOS Date: 01/23/03 
+        CMOS Checksum Error - Defaults Loaded
+
+        Processor: AMD Athlon(tm) XP 2200+
+        Memory Test: 512MB OK
+
+        Press DEL to enter Setup, F8 for Boot Menu
+
+        Detecting IDE primary master... SAMSUNG SP1604N
+        Detecting IDE primary slave... None
+        Detecting IDE secondary master... Optiarc DVD RW AD-7200A
+        Detecting IDE secondary slave... None
+
+        Verifying DMI Pool Data ...........
+
+        _
+    </pre>
+
+    <script>
+        // Ses efekti için bir audio elementi oluştur (gerektiğinde yolunu düzeltin)
+        const bootSound = new Audio('assets/audio/bios-beep.mp3'); 
+        
+        window.onload = function() {
+            bootSound.play().catch(e => console.log("Ses oynatılamadı:", e)); // Otomatik oynatma hatası için yakala
+
+            setTimeout(() => {
+                window.location.href = 'loading.html';
+            }, 4000); // 4 saniye sonra loading ekranına geç
+        };
+    </script>
+</body>
+</html>
