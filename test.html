@@ -1,0 +1,460 @@
+/* Genel Stil */
+body {
+    margin: 0;
+    overflow: hidden; /* Taşmayı engelle */
+    font-family: 'Tahoma', 'Segoe UI', sans-serif; /* XP'ye yakın yazı tipleri */
+    -webkit-font-smoothing: antialiased; /* Yazı tipi düzeltme */
+    color: black;
+}
+
+/* Boot Ekranı */
+.boot-screen {
+    background-color: black;
+    color: #AAAAAA; /* Gri metin */
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 14px;
+    padding: 20px;
+    white-space: pre-wrap;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+/* Loading Ekranı */
+.loading-screen {
+    background-color: #000080; /* Koyu mavi */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+}
+
+.xp-logo-container {
+    text-align: center;
+}
+
+.xp-logo {
+    width: 300px; /* Logo boyutunu ayarlayın */
+    image-rendering: -webkit-optimize-contrast; /* Pikselleşmeyi iyileştir */
+    -ms-interpolation-mode: nearest-neighbor;
+    image-rendering: crisp-edges;
+}
+
+.loading-bar {
+    width: 300px;
+    height: 10px;
+    background-color: rgba(255, 255, 255, 0.3);
+    margin-top: 20px;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.loading-progress {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(to right, #003399, #00CCFF); /* Mavi gradyan */
+    animation: loading-xp 3s infinite linear; /* Sonsuz animasyon */
+}
+
+@keyframes loading-xp {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* Login Ekranı */
+.login-screen {
+    background: url('assets/images/login-background.jpg') no-repeat center center fixed; /* Login arka planı */
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+}
+
+.login-container {
+    background-color: rgba(255, 255, 255, 0.9); /* Hafif şeffaf beyaz */
+    border: 1px solid #AAA;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    padding: 30px 40px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.login-header {
+    font-size: 24px;
+    font-weight: bold;
+    color: #000080; /* Koyu mavi */
+    margin-bottom: 20px;
+}
+
+.user-profile {
+    margin-bottom: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid #000080;
+    margin-bottom: 10px;
+}
+
+.username {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.password-input-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+#passwordInput {
+    padding: 8px 12px;
+    border: 1px solid #A9A9A9;
+    border-radius: 3px;
+    font-size: 16px;
+    width: 180px;
+}
+
+#passwordInput:focus {
+    outline: none;
+    border-color: #0078D7;
+    box-shadow: 0 0 5px rgba(0,120,215,0.5);
+}
+
+#loginButton {
+    background-color: #0078D7;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+}
+
+#loginButton:hover {
+    background-color: #005bb5;
+}
+
+.error-message {
+    color: red;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.login-shutdown-options {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+.shutdown-button {
+    background-color: transparent;
+    border: 1px solid #777;
+    border-radius: 3px;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.2s ease;
+}
+
+.shutdown-button:hover {
+    background-color: rgba(0,0,0,0.1);
+}
+
+.shutdown-button img {
+    width: 20px;
+    height: 20px;
+}
+
+/* Masaüstü */
+.desktop-body {
+    background-image: url('assets/images/bliss.jpg'); /* XP varsayılan duvar kağıdı */
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* İkonlar üste, görev çubuğu alta */
+    position: relative;
+    overflow: hidden;
+}
+
+/* Masaüstü İkonları */
+.desktop-icons {
+    padding: 10px;
+    display: flex;
+    flex-wrap: wrap; /* İkonların yan yana sığması */
+    align-content: flex-start; /* Üstten başlasın */
+    height: calc(100vh - 40px); /* Görev çubuğu yüksekliğini çıkar */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1; /* Görev çubuğunun altında kalmasın */
+}
+
+.desktop-icon {
+    width: 70px; /* İkon ve metin için yer */
+    height: 80px;
+    margin: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: white; /* İkon yazısı beyaz */
+    font-size: 12px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7); /* Gölge */
+    cursor: pointer;
+    user-select: none; /* Metin seçilmesin */
+    transition: background-color 0.1s ease;
+    border: 1px solid transparent; /* Seçim çerçevesi için */
+    border-radius: 3px;
+}
+
+.desktop-icon:hover {
+    background-color: rgba(0, 0, 128, 0.3); /* Mavi hover efekti */
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.desktop-icon img {
+    width: 48px; /* Büyük ikon boyutu */
+    height: 48px;
+    margin-bottom: 5px;
+}
+
+/* Görev Çubuğu */
+.taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background: linear-gradient(to bottom, #4a7be7 0%, #3d6ad1 100%); /* XP görev çubuğu gradyanı */
+    border-top: 1px solid #1a418a;
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+    z-index: 100; /* En üstte durmalı */
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.start-button {
+    background: linear-gradient(to bottom, #98c644 0%, #68a82d 100%); /* XP başlat butonu gradyanı */
+    border: 1px solid #3d6a0f;
+    border-radius: 3px;
+    padding: 2px 8px 2px 2px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 1px 2px rgba(0,0,0,0.2);
+    transition: background-color 0.1s ease;
+    height: 26px; /* Görev çubuğu yüksekliğine uyumlu */
+}
+
+.start-button:hover {
+    background: linear-gradient(to bottom, #aed458 0%, #7caf3c 100%);
+}
+
+.start-button:active {
+    background: linear-gradient(to bottom, #68a82d 0%, #98c644 100%);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.start-button img {
+    width: 24px;
+    height: 24px;
+}
+
+.quick-launch {
+    display: flex;
+    gap: 5px;
+    margin-left: 10px;
+}
+
+.quick-launch img {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.taskbar-apps {
+    flex-grow: 1; /* Ortadaki boş alanı kapla */
+    display: flex;
+    gap: 5px;
+    margin-left: 10px;
+}
+
+.system-tray {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: white;
+    font-size: 12px;
+    margin-right: 5px;
+    padding-left: 10px;
+    border-left: 1px solid #1a418a;
+    box-shadow: inset 1px 0 0 rgba(255,255,255,0.2);
+}
+
+.system-tray img {
+    width: 16px;
+    height: 16px;
+}
+
+/* Başlat Menüsü */
+.start-menu {
+    position: absolute;
+    bottom: 30px; /* Görev çubuğunun üstünde */
+    left: 0;
+    width: 300px; /* Genişlik */
+    background: linear-gradient(to right, #245199 0%, #3b74d4 100%); /* Mavi gradyan */
+    border: 1px solid #1a418a;
+    border-radius: 0 6px 6px 0; /* Sol üst köşe düz, diğerleri yuvarlak */
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 99; /* Görev çubuğunun altında, masaüstü ikonlarının üstünde */
+}
+
+.start-menu.hidden {
+    display: none;
+}
+
+#start-menu-header {
+    background: linear-gradient(to top, #245199 0%, #3b74d4 100%);
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    border-bottom: 1px solid #1a418a;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3);
+}
+
+.start-user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+#start-menu-content {
+    display: flex;
+    flex-grow: 1;
+}
+
+#start-menu-left {
+    width: 65%; /* Sol panel daha geniş */
+    background-color: white;
+    padding: 10px 0;
+    border-right: 1px solid #DEDEDE; /* Ayırıcı çizgi */
+    box-shadow: inset -1px 0 0 #F0F0F0;
+}
+
+.start-menu-group-title {
+    font-size: 12px;
+    color: #888;
+    padding: 5px 15px;
+    margin-bottom: 5px;
+}
+
+#start-menu-right {
+    width: 35%; /* Sağ panel dar */
+    background: linear-gradient(to left, #245199 0%, #3b74d4 100%);
+    padding: 10px 0;
+}
+
+.start-menu-item {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.1s ease;
+}
+
+#start-menu-left .start-menu-item {
+    color: #333;
+}
+
+#start-menu-right .start-menu-item {
+    color: white;
+}
+
+.start-menu-item:hover {
+    background-color: #316AC5; /* XP'ye özgü mavi hover */
+    color: white !important;
+}
+
+.start-menu-item:hover img {
+    filter: brightness(1.2); /* İkonlar hoverda parlasın */
+}
+
+.start-menu-item img {
+    width: 24px;
+    height: 24px;
+}
+
+.start-menu-separator {
+    border: none;
+    border-top: 1px solid #DEDEDE;
+    margin: 10px 15px;
+}
+
+.start-menu-bottom {
+    background: linear-gradient(to top, #245199 0%, #3b74d4 100%);
+    padding: 5px 10px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    border-top: 1px solid #1a418a;
+    box-shadow: inset 0 -1px 0 rgba(255,255,255,0.3);
+}
+
+.start-menu-bottom .start-menu-item.logout {
+    background-color: #CA2C2C; /* Kırmızı kapatma butonu */
+    color: white;
+    font-weight: bold;
+    border-radius: 3px;
+    padding: 5px 10px;
+}
+
+.start-menu-bottom .start-menu-item.logout:hover {
+    background-color: #E24F4F;
+}
+
+.start-menu-bottom .start-menu-item.logout img {
+    filter: brightness(2); /* Kapatma ikonu beyaz olsun */
+}
+
+.arrow-right {
+    font-size: 1.2em;
+    margin-left: auto; /* Sağa yasla */
+    font-weight: bold;
+}
