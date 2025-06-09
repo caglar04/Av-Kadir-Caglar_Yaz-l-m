@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows XP Professional</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="desktop-body">
+    <div class="desktop-icons">
+        <div class="desktop-icon" data-app="my-computer">
+            <img src="assets/icons/my-computer.png" alt="Bilgisayarım">
+            <span>Bilgisayarım</span>
+        </div>
+        <div class="desktop-icon" data-app="recycle-bin">
+            <img src="assets/icons/recycle-bin-empty.png" alt="Geri Dönüşüm Kutusu">
+            <span>Geri Dönüşüm Kutusu</span>
+        </div>
+        <div class="desktop-icon" data-app="my-documents">
+            <img src="assets/icons/my-documents.png" alt="Belgelerim">
+            <span>Belgelerim</span>
+        </div>
+        <div class="desktop-icon" data-app="internet-explorer">
+            <img src="assets/icons/ie.png" alt="Internet Explorer">
+            <span>Internet Explorer</span>
+        </div>
+    </div>
+
+    <div class="taskbar">
+        <button id="startButton" class="start-button">
+            <img src="assets/icons/start-logo.png" alt="Başlat">
+            <span>Başlat</span>
+        </button>
+
+        <div class="quick-launch">
+            <img src="assets/icons/ie.png" alt="Internet Explorer">
+            <img src="assets/icons/outlook.png" alt="Outlook Express">
+        </div>
+
+        <div class="taskbar-apps">
+            </div>
+
+        <div class="system-tray">
+            <img src="assets/icons/network-connected.png" alt="Ağ Bağlantısı">
+            <img src="assets/icons/volume.png" alt="Ses">
+            <span id="currentTime"></span>
+        </div>
+    </div>
+
+    <div id="startMenu" class="start-menu hidden">
+        <div id="start-menu-header">
+            <img src="assets/images/default-user.png" alt="Kullanıcı" class="start-user-avatar">
+            <span>Kullanıcı Adı</span>
+        </div>
+        <div id="start-menu-content">
+            <div id="start-menu-left">
+                <div class="start-menu-group-title">Sık Kullanılan Programlar</div>
+                <div class="start-menu-item" data-app="internet-explorer">
+                    <img src="assets/icons/ie-small.png" alt="IE">
+                    Internet Explorer
+                </div>
+                <div class="start-menu-item" data-app="outlook-express">
+                    <img src="assets/icons/outlook-small.png" alt="Outlook">
+                    Outlook Express
+                </div>
+                <hr class="start-menu-separator">
+                <div class="start-menu-item" data-app="notepad">
+                    <img src="assets/icons/notepad-small.png" alt="Not Defteri">
+                    Not Defteri
+                </div>
+                <div class="start-menu-item" data-app="calculator">
+                    <img src="assets/icons/calculator-small.png" alt="Hesap Makinesi">
+                    Hesap Makinesi
+                </div>
+                <div class="start-menu-item" data-app="all-programs">
+                    <img src="assets/icons/folder-small.png" alt="Programlar">
+                    Tüm Programlar <span class="arrow-right">></span>
+                </div>
+            </div>
+            <div id="start-menu-right">
+                <div class="start-menu-item" data-app="my-documents">
+                    <img src="assets/icons/folder-small.png" alt="Belgelerim">
+                    Belgelerim
+                </div>
+                <div class="start-menu-item" data-app="my-pictures">
+                    <img src="assets/icons/pictures-folder-small.png" alt="Resimlerim">
+                    Resimlerim
+                </div>
+                <div class="start-menu-item" data-app="my-music">
+                    <img src="assets/icons/music-folder-small.png" alt="Müziğim">
+                    Müziğim
+                </div>
+                <div class="start-menu-item" data-app="my-computer">
+                    <img src="assets/icons/computer-small.png" alt="Bilgisayarım">
+                    Bilgisayarım
+                </div>
+                <div class="start-menu-item" data-app="control-panel">
+                    <img src="assets/icons/control-panel-small.png" alt="Denetim Masası">
+                    Denetim Masası
+                </div>
+                <div class="start-menu-item" data-app="network-connections">
+                    <img src="assets/icons/network-small.png" alt="Ağ Bağlantıları">
+                    Ağ Bağlantıları
+                </div>
+                <div class="start-menu-item" data-app="help-and-support">
+                    <img src="assets/icons/help-small.png" alt="Yardım ve Destek">
+                    Yardım ve Destek
+                </div>
+                <div class="start-menu-item" data-app="run">
+                    <img src="assets/icons/run-small.png" alt="Çalıştır...">
+                    Çalıştır...
+                </div>
+            </div>
+        </div>
+        <div class="start-menu-bottom">
+            <div class="start-menu-item logout" onclick="window.location.href='login.html';">
+                <img src="assets/icons/shutdown-small.png" alt="Kapat">
+                Kapat
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
